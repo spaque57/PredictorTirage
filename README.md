@@ -6,5 +6,5 @@ Details of the script :
 - get best combinaison of balls
 
 Predictor :
-- give best 5 stars suit of result
-- give best 5 balls suit of result
+- give best 5 stars suite of result
+- give best 5 balls suite of result
