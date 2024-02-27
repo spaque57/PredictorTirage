@@ -1,27 +1,38 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using System.Collections.Generic;
 
 namespace Predictor;
 
 internal class Program
 {
+    // --- Generic objects
+    // Dict for combinaisons
+    static Dictionary<int, int> countEachBalls = new Dictionary<int, int>();
+    static Dictionary<int, int> countEachStars = new Dictionary<int, int>();
+    static Dictionary<string, int> countBall_5_star = new Dictionary<string, int>();
+    static Dictionary<string, int> countBall_5 = new Dictionary<string, int>();
+    static Dictionary<string, int> countBall_4 = new Dictionary<string, int>();
+    static Dictionary<string, int> countBall_3 = new Dictionary<string, int>();
+
+    // balls
+    static Dictionary<int, int> ballPredict1 = new Dictionary<int, int>();
+    static Dictionary<int, Dictionary<int, int>> ballPredict2 = new Dictionary<int, Dictionary<int, int>>();
+    static Dictionary<int, Dictionary<int, Dictionary<int, int>>> ballPredict3 = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
+    static Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>> ballPredict4 = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>();
+    static Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>> ballPredict = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>>();
+
+    // stars
+    static Dictionary<int, int> starPredict1 = new Dictionary<int, int>();
+    static Dictionary<int, Dictionary<int, int>> starPredict2 = new Dictionary<int, Dictionary<int, int>>();
+    static Dictionary<int, Dictionary<int, Dictionary<int, int>>> starPredict3 = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
+    static Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>> starPredict4 = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>();
+    static Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>> starPredict = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>>();
+
+
+
     // --- Main methods called
     static void Main(string[] args)
     {
-        /*
-        List<int> Grid = GenerateGrid();
-
-        string generatedGrid = "";
-        int index = 0;
-        foreach (int number in Grid) {
-            if(index == 0) generatedGrid = generatedGrid + number;
-            else if (index > 0 && index < 5) generatedGrid = generatedGrid +  " - " + number;
-            else generatedGrid = generatedGrid + " - Star - " + number;
-
-            index++;
-        }
-        Console.WriteLine(generatedGrid);
-        */
-
         Console.WriteLine("---> Load file...");
 
         List<string> tirages = OpenDataFile();
@@ -79,13 +90,6 @@ internal class Program
 
     static void Statistics(List<string> tirageList)
     {
-        // Dict for combinaisons
-        Dictionary<int, int> countEachBalls = new Dictionary<int, int>();
-        Dictionary<int, int> countEachStars = new Dictionary<int, int>();
-        Dictionary<string, int> countBall_5_star = new Dictionary<string, int>();
-        Dictionary<string, int> countBall_5 = new Dictionary<string, int>();
-        Dictionary<string, int> countBall_4 = new Dictionary<string, int>();
-
         // --- Simple stats
         foreach (string tirage in tirageList) {
             List<int> allBallsNumber = new List<int>();
@@ -142,6 +146,12 @@ internal class Program
                         {
                             if (!newCombinaison.Contains(ball3)) {
                                 newCombinaison.Add(ball3);
+                                newCombinaison.Sort();
+
+                                string combinaison3 = newCombinaison[0].ToString() + "-" + newCombinaison[1].ToString() + "-" + newCombinaison[2].ToString();
+
+                                if (countBall_3.ContainsKey(combinaison3)) countBall_3[combinaison3]++;
+                                else countBall_3[combinaison3] = 1;
 
                                 // Fourth ball
                                 foreach (int ball4 in allBallsNumberNoStar)
@@ -150,7 +160,6 @@ internal class Program
                                         newCombinaison.Add(ball4);
                                         newCombinaison.Sort();
 
-
                                         string combinaison = newCombinaison[0].ToString() + "-" + newCombinaison[1].ToString() + "-" + newCombinaison[2].ToString() + "-" + newCombinaison[3].ToString();
 
                                         if (countBall_4.ContainsKey(combinaison)) countBall_4[combinaison]++;
@@ -158,7 +167,6 @@ internal class Program
                                     }
                                 }
                             }
-
                         }
                     }
                 }
@@ -166,13 +174,6 @@ internal class Program
         }
 
         // --- Predictor
-        // balls
-        Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>> ballPredict = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>>();
-
-        // stars
-        Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>> starPredict = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>>();
-        Dictionary<int, Dictionary<int, Dictionary<int, int>>> tripleStarPredict = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
-
         // Running
         int star1 = 0;
         int star2 = 0;
@@ -212,19 +213,47 @@ internal class Program
             else
             {
                 foreach (int saveB1 in b1) {
+                    // level 1
+                    if (!ballPredict1.ContainsKey(saveB1)) ballPredict1[saveB1] = 1;
+                    else ballPredict1[saveB1]++;
+                    // level 2
+                    if (!ballPredict2.ContainsKey(saveB1)) ballPredict2[saveB1] = new Dictionary<int, int>();
+                    // level 3
+                    if (!ballPredict3.ContainsKey(saveB1)) ballPredict3[saveB1] = new Dictionary<int, Dictionary<int, int>>();
+                    // level 4
+                    if (!ballPredict4.ContainsKey(saveB1)) ballPredict4[saveB1] = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
+
+                    // level 5
                     if (!ballPredict.ContainsKey(saveB1)) ballPredict[saveB1] = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>();
-
                     foreach (int saveB2 in b2) {
+                        // level 2
+                        if (!ballPredict2[saveB1].ContainsKey(saveB2)) ballPredict2[saveB1][saveB2] = 1;
+                        else ballPredict2[saveB1][saveB2]++;
+                        // level 3
+                        if (!ballPredict3[saveB1].ContainsKey(saveB2)) ballPredict3[saveB1][saveB2] = new Dictionary<int, int>();
+                        // level 4
+                        if (!ballPredict4[saveB1].ContainsKey(saveB2)) ballPredict4[saveB1][saveB2] = new Dictionary<int, Dictionary<int, int>>();
+
+                        // level 5
                         if (!ballPredict[saveB1].ContainsKey(saveB2)) ballPredict[saveB1][saveB2] = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
-
                         foreach (int saveB3 in b3)
-                        {
-                            if (!ballPredict[saveB1][saveB2].ContainsKey(saveB3)) ballPredict[saveB1][saveB2][saveB3] = new Dictionary<int, Dictionary<int, int>>();
+                        {                        
+                            // level 3
+                            if (!ballPredict3[saveB1][saveB2].ContainsKey(saveB3)) ballPredict3[saveB1][saveB2][saveB3] = 1;
+                            else ballPredict3[saveB1][saveB2][saveB3]++;
+                            // level 4
+                            if (!ballPredict4[saveB1][saveB2].ContainsKey(saveB3)) ballPredict4[saveB1][saveB2][saveB3] = new Dictionary<int, int>();
 
+                            // level 5
+                            if (!ballPredict[saveB1][saveB2].ContainsKey(saveB3)) ballPredict[saveB1][saveB2][saveB3] = new Dictionary<int, Dictionary<int, int>>();
                             foreach (int saveB4 in b4)
                             {
-                                if (!ballPredict[saveB1][saveB2][saveB3].ContainsKey(saveB4)) ballPredict[saveB1][saveB2][saveB3][saveB4] = new Dictionary<int, int>();
+                                // level 4
+                                if (!ballPredict4[saveB1][saveB2][saveB3].ContainsKey(saveB4)) ballPredict4[saveB1][saveB2][saveB3][saveB4] = 1;
+                                else ballPredict4[saveB1][saveB2][saveB3][saveB4]++;
 
+                                // level 5
+                                if (!ballPredict[saveB1][saveB2][saveB3].ContainsKey(saveB4)) ballPredict[saveB1][saveB2][saveB3][saveB4] = new Dictionary<int, int>();
                                 foreach (int saveB5 in b5)
                                 {
                                     if (!ballPredict[saveB1][saveB2][saveB3][saveB4].ContainsKey(saveB5)) ballPredict[saveB1][saveB2][saveB3][saveB4][saveB5] = 1;
@@ -251,12 +280,43 @@ internal class Program
             else if (star5 == 0) star5 = int.Parse(hitNumbers[5]);
             // loop
             else {
-                // save predict
+                // LEVEL 1
+                if (!starPredict1.ContainsKey(star1)) starPredict1[star1] = 1;
+                else starPredict1[star1]++;
+                // level 2
+                if (!starPredict2.ContainsKey(star1)) starPredict2[star1] = new Dictionary<int, int>();
+                // level 3
+                if (!starPredict3.ContainsKey(star1)) starPredict3[star1] = new Dictionary<int, Dictionary<int, int>>();
+                // level 4
+                if (!starPredict4.ContainsKey(star1)) starPredict4[star1] = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
+                // level 5
                 if (!starPredict.ContainsKey(star1)) starPredict[star1] = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>();
+
+                // LEVEL 2
+                if (!starPredict2[star1].ContainsKey(star2)) starPredict2[star1][star2] = 1;
+                starPredict2[star1][star2]++;
+                // level 3
+                if (!starPredict3[star1].ContainsKey(star2)) starPredict3[star1][star2] = new Dictionary<int, int>();
+                // level 4
+                if (!starPredict4[star1].ContainsKey(star2)) starPredict4[star1][star2] = new Dictionary<int, Dictionary<int, int>>();
+                // level 5
                 if (!starPredict[star1].ContainsKey(star2)) starPredict[star1][star2] = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
+
+                // LEVEL 3
+                if (!starPredict3[star1][star2].ContainsKey(star3)) starPredict3[star1][star2][star3] = 1;
+                else starPredict3[star1][star2][star3]++;
+                // level 4
+                if (!starPredict4[star1][star2].ContainsKey(star3)) starPredict4[star1][star2][star3] = new Dictionary<int, int>();
+                // level 5
                 if (!starPredict[star1][star2].ContainsKey(star3)) starPredict[star1][star2][star3] = new Dictionary<int, Dictionary<int, int>>();
+
+                // LEVEL 4
+                if (!starPredict4[star1][star2][star3].ContainsKey(star4)) starPredict4[star1][star2][star3][star4] = 1;
+                else starPredict4[star1][star2][star3][star4]++;
+                // level 5
                 if (!starPredict[star1][star2][star3].ContainsKey(star4)) starPredict[star1][star2][star3][star4] = new Dictionary<int, int>();
 
+                // LEVEL 4
                 if (!starPredict[star1][star2][star3][star4].ContainsKey(star5)) starPredict[star1][star2][star3][star4][star5] = 1;
                 else starPredict[star1][star2][star3][star4][star5]++; 
             
@@ -282,26 +342,28 @@ internal class Program
             Console.WriteLine("---> Results");
             Console.WriteLine("- All tirages : " + countBall_5_star.Count());
             Console.WriteLine("- All tirages no star : " + countBall_5.Count());
-            Console.WriteLine("- All combinaison : " + countBall_4.Count());
+            Console.WriteLine("- All combinaison 4b : " + countBall_4.Count());
+            Console.WriteLine("- All combinaison 3b : " + countBall_3.Count());
             writer.WriteLine("---> Results");
             writer.WriteLine("- All tirages : " + countBall_5_star.Count());
             writer.WriteLine("- All tirages no star : " + countBall_5.Count());
-            writer.WriteLine("- All combinaison : " + countBall_4.Count());
+            writer.WriteLine("- All combinaison 4b : " + countBall_4.Count());
+            writer.WriteLine("- All combinaison 3b : " + countBall_3.Count());
 
             // --- Simple stats results
             // best/bad ball numbers
             foreach (int ball in sortedCountEachBalls.Keys)
             {
-                if (sortedCountEachBalls[ball] > 120) Console.WriteLine("!! Best ball : " + ball.ToString() + " - nb fois : " + sortedCountEachBalls[ball].ToString());
+                if (sortedCountEachBalls[ball] > 80) Console.WriteLine("!! Best ball : " + ball.ToString() + " - nb fois : " + sortedCountEachBalls[ball].ToString());
 
-                if (sortedCountEachBalls[ball] < 100) Console.WriteLine("- Bad ball : " + ball.ToString() + " - nb fois : " + sortedCountEachBalls[ball].ToString());
+                if (sortedCountEachBalls[ball] < 60) Console.WriteLine("- Bad ball : " + ball.ToString() + " - nb fois : " + sortedCountEachBalls[ball].ToString());
             }
             // best/bad star numbers
             foreach (int star in sortedCountEachStars.Keys)
             {
-                if (sortedCountEachStars[star] > 120) Console.WriteLine("?? Best star : " + star.ToString() + " - nb fois : " + sortedCountEachStars[star].ToString());
+                if (sortedCountEachStars[star] > 70) Console.WriteLine("?? Best star : " + star.ToString() + " - nb fois : " + sortedCountEachStars[star].ToString());
 
-                if (sortedCountEachStars[star] < 100) Console.WriteLine("- Bad star : " + star.ToString() + " - nb fois : " + sortedCountEachStars[star].ToString());
+                if (sortedCountEachStars[star] < 50) Console.WriteLine("- Bad star : " + star.ToString() + " - nb fois : " + sortedCountEachStars[star].ToString());
             }
 
             // best tirage
@@ -313,12 +375,18 @@ internal class Program
             foreach (string tirage in countBall_4.Keys)
             {
                 writer.WriteLine(tirage);
-                if (countBall_4[tirage] > 2) Console.WriteLine("Combinaison : " + tirage + " - nb fois : " + countBall_4[tirage].ToString());
+                if (countBall_4[tirage] > 2) Console.WriteLine("Combinaison 4b : " + tirage + " - nb fois : " + countBall_4[tirage].ToString());
+            }
+            // best 4 combinaison
+            foreach (string tirage in countBall_3.Keys)
+            {
+                writer.WriteLine(tirage);
+                if (countBall_3[tirage] > 2) Console.WriteLine("Combinaison 3b : " + tirage + " - nb fois : " + countBall_3[tirage].ToString());
             }
 
             // --- Predictor results
-            Console.WriteLine("\n---> Predictor");
-            // strt prediction
+            Console.WriteLine("\n---> Predictor best suite");
+            // star prediction
             for (int i = 1; i < 11; i++)
             {
                 if (starPredict.ContainsKey(i)) {
@@ -378,6 +446,87 @@ internal class Program
                     }
                 }
             }
+
+            // BAD PREDICTION - 1
+            // Best ball suite prediction
+            Console.WriteLine("\n---> FIRST BAD PREDICTION");
+            Console.WriteLine("--> Predictor bad predicted suite");
+            List<string> badBallsPredResult = PredictBadBallSuite();
+            foreach (string line in badBallsPredResult) { Console.WriteLine(line); }
+
+            // PREDICTION - 1
+            // Best star suite prediction
+            Console.WriteLine("\n---> FIRST PREDICTION");
+            Console.WriteLine("--> Predictor best predicted suite");
+            int bestS1 = starPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            List<string> starPredResult = PredictBestStarSuite();
+            foreach(string line in starPredResult) { Console.WriteLine(line); }
+
+            // Best ball suite prediction
+            Console.WriteLine("\n--> Predictor best predicted suite");
+            int bestB1 = ballPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            List<string> ballsPredResult = PredictBestBallSuite();
+            foreach (string line in ballsPredResult) { Console.WriteLine(line); }
+
+            // PREDICTION - 2
+            starPredict1.Remove(bestS1);
+            ballPredict1.Remove(bestB1);
+            Console.WriteLine("\n---> SECOND PREDICTION");
+            Console.WriteLine("--> Predictor best predicted suite");
+            bestS1 = starPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            starPredResult = PredictBestStarSuite();
+            foreach (string line in starPredResult) { Console.WriteLine(line); }
+
+            // Best ball suite prediction
+            Console.WriteLine("\n--> Predictor best predicted suite");
+            bestB1 = ballPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            ballsPredResult = PredictBestBallSuite();
+            foreach (string line in ballsPredResult) { Console.WriteLine(line); }
+
+            // PREDICTION - 3
+            starPredict1.Remove(bestS1);
+            ballPredict1.Remove(bestB1);
+            Console.WriteLine("\n---> THIRD PREDICTION");
+            Console.WriteLine("--> Predictor best predicted suite");
+            bestS1 = starPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            starPredResult = PredictBestStarSuite();
+            foreach (string line in starPredResult) { Console.WriteLine(line); }
+
+            // Best ball suite prediction
+            Console.WriteLine("\n--> Predictor best predicted suite");
+            bestB1 = ballPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            ballsPredResult = PredictBestBallSuite();
+            foreach (string line in ballsPredResult) { Console.WriteLine(line); }
+
+            // PREDICTION - 4
+            starPredict1.Remove(bestS1);
+            ballPredict1.Remove(bestB1);
+            Console.WriteLine("\n---> FOURTH PREDICTION");
+            Console.WriteLine("--> Predictor best predicted suite");
+            bestS1 = starPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            starPredResult = PredictBestStarSuite();
+            foreach (string line in starPredResult) { Console.WriteLine(line); }
+
+            // Best ball suite prediction
+            Console.WriteLine("\n--> Predictor best predicted suite");
+            bestB1 = ballPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            ballsPredResult = PredictBestBallSuite();
+            foreach (string line in ballsPredResult) { Console.WriteLine(line); }
+
+            // PREDICTION - 5
+            starPredict1.Remove(bestS1);
+            ballPredict1.Remove(bestB1);
+            Console.WriteLine("\n---> FIVE PREDICTION");
+            Console.WriteLine("--> Predictor best predicted suite");
+            bestS1 = starPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            starPredResult = PredictBestStarSuite();
+            foreach (string line in starPredResult) { Console.WriteLine(line); }
+
+            // Best ball suite prediction
+            Console.WriteLine("\n--> Predictor best predicted suite");
+            bestB1 = ballPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            ballsPredResult = PredictBestBallSuite();
+            foreach (string line in ballsPredResult) { Console.WriteLine(line); }
         }
     }
 
@@ -397,5 +546,158 @@ internal class Program
         else number = rnd.Next(1, 50);
 
         return number;
+    }
+
+    static private bool Is4CombinaisonFound(List<int> allBallsNumberNoStar, Dictionary<string, int> countBall_4) {
+        bool isCombinaisonFound = false;
+
+        List<int> newCombinaison = new List<int>();
+        foreach (int ball1 in allBallsNumberNoStar)
+        {
+            newCombinaison.Add(ball1);
+
+            // Second ball
+            foreach (int ball2 in allBallsNumberNoStar)
+            {
+                if (!newCombinaison.Contains(ball2))
+                {
+                    newCombinaison.Add(ball2);
+
+                    // Third ball
+                    foreach (int ball3 in allBallsNumberNoStar)
+                    {
+                        if (!newCombinaison.Contains(ball3))
+                        {
+                            newCombinaison.Add(ball3);
+
+                            // Fourth ball
+                            foreach (int ball4 in allBallsNumberNoStar)
+                            {
+                                if (!newCombinaison.Contains(ball4))
+                                {
+                                    newCombinaison.Add(ball4);
+                                    newCombinaison.Sort();
+
+                                    string combinaison = newCombinaison[0].ToString() + "-" + newCombinaison[1].ToString() + "-" + newCombinaison[2].ToString() + "-" + newCombinaison[3].ToString();
+
+                                    if (countBall_4.ContainsKey(combinaison)) isCombinaisonFound = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return isCombinaisonFound;
+    }
+
+    static private List<string> PredictBestBallSuite() {
+        List<string> results = new List<string>();
+
+        Dictionary<int, int> ballPredict1Copy = new Dictionary<int, int>(ballPredict1);
+        Dictionary<int, Dictionary<int, int>> ballPredict2Copy = new Dictionary<int, Dictionary<int, int>>(ballPredict2);
+        Dictionary<int, Dictionary<int, Dictionary<int, int>>> ballPredict3Copy = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>(ballPredict3);
+        Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>> ballPredict4Copy = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>(ballPredict4);
+        Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>> ballPredictCopy = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>>(ballPredict);
+
+        // Best ball suite prediction
+        // B1
+        List<int> predictedTirage = new List<int>();
+        int bestB1 = ballPredict1Copy.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        predictedTirage.Add(bestB1);
+
+        // B2
+        ballPredict2Copy[bestB1].Remove(bestB1);
+        int bestB2 = ballPredict2Copy[bestB1].Aggregate((a, b) => a.Value > b.Value ? a : b).Key;
+        predictedTirage.Add(bestB2);
+
+        // B3
+        ballPredict3Copy[bestB1][bestB2].Remove(bestB1);
+        ballPredict3Copy[bestB1][bestB2].Remove(bestB2);
+        int bestB3 = ballPredict3Copy[bestB1][bestB2].Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        predictedTirage.Add(bestB3);
+
+        // B4
+        ballPredict4Copy[bestB1][bestB2][bestB3].Remove(bestB1);
+        ballPredict4Copy[bestB1][bestB2][bestB3].Remove(bestB2);
+        ballPredict4Copy[bestB1][bestB2][bestB3].Remove(bestB3);
+        int bestB4 = ballPredict4Copy[bestB1][bestB2][bestB3].Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        predictedTirage.Add(bestB4);
+
+        // B5
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB1);
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB2);
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB3);
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB4);
+        int bestB5 = ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        predictedTirage.Add(bestB5);
+        results.Add("/!\\ Best Ball Combinaison prediction : " + bestB1.ToString() + " -> " + bestB2.ToString() + " -> " + bestB3.ToString() + " -> " + bestB4.ToString() + " - " + bestB5.ToString());
+        results.Add("/!\\ Respective chances : " + ballPredict1[bestB1].ToString() + " - " + ballPredict2[bestB1][bestB2].ToString() + " - " + ballPredict3[bestB1][bestB2][bestB3].ToString() + " - " + ballPredict4[bestB1][bestB2][bestB3][bestB4].ToString() + " - " + ballPredict[bestB1][bestB2][bestB3][bestB4][bestB5].ToString());
+        if (Is4CombinaisonFound(predictedTirage, countBall_4)) results.Add("° Tirage déjà sortit en combinaiso de 4 °");
+
+        return results;
+    }
+
+    static private List<string> PredictBadBallSuite()
+    {
+        List<string> results = new List<string>();
+
+        Dictionary<int, int> ballPredict1Copy = new Dictionary<int, int>(ballPredict1);
+        Dictionary<int, Dictionary<int, int>> ballPredict2Copy = new Dictionary<int, Dictionary<int, int>>(ballPredict2);
+        Dictionary<int, Dictionary<int, Dictionary<int, int>>> ballPredict3Copy = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>(ballPredict3);
+        Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>> ballPredict4Copy = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>(ballPredict4);
+        Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>> ballPredictCopy = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, int>>>>>(ballPredict);
+
+        // Best ball suite prediction
+        // B1
+        List<int> predictedTirage = new List<int>();
+        int bestB1 = ballPredict1Copy.Aggregate((x, y) => x.Value < y.Value ? x : y).Key;
+        predictedTirage.Add(bestB1);
+
+        // B2
+        ballPredict2Copy[bestB1].Remove(bestB1);
+        int bestB2 = ballPredict2Copy[bestB1].Aggregate((a, b) => a.Value < b.Value ? a : b).Key;
+        predictedTirage.Add(bestB2);
+
+        // B3
+        ballPredict3Copy[bestB1][bestB2].Remove(bestB1);
+        ballPredict3Copy[bestB1][bestB2].Remove(bestB2);
+        int bestB3 = ballPredict3Copy[bestB1][bestB2].Aggregate((x, y) => x.Value < y.Value ? x : y).Key;
+        predictedTirage.Add(bestB3);
+
+        // B4
+        ballPredict4Copy[bestB1][bestB2][bestB3].Remove(bestB1);
+        ballPredict4Copy[bestB1][bestB2][bestB3].Remove(bestB2);
+        ballPredict4Copy[bestB1][bestB2][bestB3].Remove(bestB3);
+        int bestB4 = ballPredict4Copy[bestB1][bestB2][bestB3].Aggregate((x, y) => x.Value < y.Value ? x : y).Key;
+        predictedTirage.Add(bestB4);
+
+        // B5
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB1);
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB2);
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB3);
+        ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Remove(bestB4);
+        int bestB5 = ballPredictCopy[bestB1][bestB2][bestB3][bestB4].Aggregate((x, y) => x.Value < y.Value ? x : y).Key;
+        predictedTirage.Add(bestB5);
+        results.Add("/!\\ Best Ball Combinaison prediction : " + bestB1.ToString() + " -> " + bestB2.ToString() + " -> " + bestB3.ToString() + " -> " + bestB4.ToString() + " - " + bestB5.ToString());
+        results.Add("/!\\ Respective chances : " + ballPredict1[bestB1].ToString() + " - " + ballPredict2[bestB1][bestB2].ToString() + " - " + ballPredict3[bestB1][bestB2][bestB3].ToString() + " - " + ballPredict4[bestB1][bestB2][bestB3][bestB4].ToString() + " - " + ballPredict[bestB1][bestB2][bestB3][bestB4][bestB5].ToString());
+        if (Is4CombinaisonFound(predictedTirage, countBall_4)) results.Add("° Tirage déjà sortit en combinaiso de 4 °");
+
+        return results;
+    }
+
+    static private List<string> PredictBestStarSuite() {
+        List<string> results = new List<string>();
+
+        int bestS1 = starPredict1.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        int bestS2 = starPredict2[bestS1].Aggregate((a, b) => a.Value > b.Value ? a : b).Key;
+        int bestS3 = starPredict3[bestS1][bestS2].Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        int bestS4 = starPredict4[bestS1][bestS2][bestS3].Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        int bestS5 = starPredict[bestS1][bestS2][bestS3][bestS4].Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        results.Add("/!\\ Best Secret Suite prediction : " + bestS1.ToString() + " -> " + bestS2.ToString() + " -> " + bestS3.ToString() + " -> " + bestS4.ToString() + " - " + bestS5.ToString());
+        results.Add("/!\\ Respective chances : " + starPredict1[bestS1].ToString() + " - " + starPredict2[bestS1][bestS2].ToString() + " - " + starPredict3[bestS1][bestS2][bestS3].ToString() + " - " + starPredict4[bestS1][bestS2][bestS3][bestS4].ToString() + " - " + starPredict[bestS1][bestS2][bestS3][bestS4][bestS5].ToString());
+
+        return results;
     }
 }
